@@ -1,9 +1,12 @@
 token.txt
+
 *.jpeg
 *.JPEG
 *.jpg
 *.tgz
-!data-generation/test-images/test/a
-!data-generation/test-images/test/b
-!data-generation/test-images/test/c
+*.DS_Store
+
+data-generation/test-images/imagenette2-160/noisy_imagenette.csv
+
+
 
