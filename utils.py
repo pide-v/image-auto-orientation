@@ -1,3 +1,7 @@
+"""
+utils.py contains some basic utility functions
+"""
+
 import os
 from PIL import Image
 import tensorflow as tf
