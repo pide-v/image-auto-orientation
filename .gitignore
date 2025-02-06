@@ -3,4 +3,7 @@ token.txt
 *.JPEG
 *.jpg
 *.tgz
-data-generation/test-images
+!data-generation/test-images/test/a
+!data-generation/test-images/test/b
+!data-generation/test-images/test/c
+
