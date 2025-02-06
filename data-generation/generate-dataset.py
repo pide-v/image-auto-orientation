@@ -18,7 +18,7 @@ for folder in classes:
 			img = Image.open(f'{test_path}/{folder}/{im}')
 			rot_img = img.rotate(rot)
 			print(f'Saving image {im} at {rot} degrees')
-			rot_img.save(f'{test_path}/{folder}_{rot}/{im[:-5]}_{rot}.jpeg')
+			rot_img.save(f'{test_path}/{folder}_{rot}/{im[:-5]}_{rot}.JPEG')
 
 		
 
