@@ -1,1 +1,6 @@
 token.txt
+*.jpeg
+*.JPEG
+*.jpg
+*.tgz
+data-generation/test-images
