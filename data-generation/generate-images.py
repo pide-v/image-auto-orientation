@@ -1,7 +1,6 @@
 import numpy as np
 from PIL import Image
 import os
-import csv
 
 #path must be a folder containing only N subfolders. Each subfolder's name represents the
 #class of the images that it contains. 
