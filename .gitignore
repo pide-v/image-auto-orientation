@@ -6,7 +6,8 @@ token.txt
 *.tgz
 *.DS_Store
 
-data-generation/
+images/
+ss-dataset/
 
 test.py
 

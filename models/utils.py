@@ -29,17 +29,18 @@ def generate_images(path, dest_path):
 	classes = [f for f in os.listdir(path) if not f.startswith('.')]
 	print(f'Found {len(classes)} classes: {classes}')
 
-	for folder in classes:
-		print(f'### Processing images of class {folder} ###')
-		for rot in [0, 90, 180, 270]:
-			try:
-				os.mkdir(f'{dest_path}/{rot}')
-			except FileExistsError:
-				print(f'generate-dataset.py: Directory {dest_path}/{folder}_{rot} already exists. Ignoring creation.')
+
+	for rot in [0, 90, 180, 270]:
+		try:
+			os.mkdir(f'{dest_path}/{rot}')
+		except FileExistsError:
+			print(f'generate-dataset.py: Directory {dest_path}/{rot} already exists. Make sure the destination folder is empty before starting. Aborting...')
+			break
+		for folder in classes:
+			print(f'Saving images of class {folder} at {rot} degrees...')
 			for im in os.listdir(f'{path}/{folder}'):
 				img = Image.open(f'{path}/{folder}/{im}')
 				rot_img = img.rotate(rot)
-				print(f'Saving image {im} at {rot} degrees')
 				rot_img.save(f'{dest_path}/{rot}/{im[:-5]}_{rot}.JPEG')
 
 
