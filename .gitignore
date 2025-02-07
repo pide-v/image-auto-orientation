@@ -7,6 +7,3 @@ token.txt
 *.DS_Store
 
 data-generation/test-images/imagenette2-160/noisy_imagenette.csv
-
-
-
