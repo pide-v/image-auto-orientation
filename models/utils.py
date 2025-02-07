@@ -3,6 +3,7 @@ utils.py contains some basic utility functions
 """
 
 import os
+import numpy as np
 from PIL import Image
 import tensorflow as tf
 
@@ -20,8 +21,8 @@ This rotated images and the original one are saved in the dest_path in the follo
 	rot-images
 		|-- 0
   		|-- 90
-    		|-- 180
-      		|-- 270
+    	|-- 180
+      	|-- 270
 """
 
 def generate_images(path, dest_path):
@@ -43,16 +44,29 @@ def generate_images(path, dest_path):
 
 
 """
-generate_dataset returns an iterable containing batch_size images as numpy arrays and the respective labels.
+generate_dataset returns two numpy arrays x, y of shape (N, w, h, c) and (N,).
+N = number of samples
+w = sample width
+h = sample height
+c = number of channels (default = 3)
 
-@example
-	iter = generate_dataset(path)
-	batch = iter.next()
-	batch[0] --> images
-	batch[1] --> labels
+x, y dtype is uint8.
 
+note: since classes are the folder taken in order we have the following:
+	class 0 -> 0 degree rotation
+	class 1 -> 180 degree rotation
+	class 2 -> 270 degree rotation
+	class 3 -> 90 degree rotation
 
 """
-def generate_dataset(path):
-	data = tf.keras.utils.image_dataset_from_directory(path, batch_size=4, image_size=(160, 160))
-	return data.as_numpy_iterator()
+def generate_dataset(path, image_size, channels=3):
+	data = tf.keras.utils.image_dataset_from_directory(path, batch_size=1, image_size=image_size)
+	size = sum(1 for _ in data)
+	x = np.zeros((size, image_size[0], image_size[1], channels), dtype=np.uint8)
+	y = np.zeros((size), dtype=np.uint8)
+
+	for i, (image, label) in enumerate(data.as_numpy_iterator()):
+		x[i] = image[0]
+		y[i] = label[0]
+
+	return x, y

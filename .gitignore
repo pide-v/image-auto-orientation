@@ -6,4 +6,6 @@ token.txt
 *.tgz
 *.DS_Store
 
-data-generation/test-images/imagenette2-160/noisy_imagenette.csv
+data-generation/
+
+test.py
