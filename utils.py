@@ -18,14 +18,10 @@ generate_images takes all the images for each class and generates their rotation
 This rotated images and the original one are saved in the dest_path in the following way:
 
 	rot-images
-		|-- class-1-images_0
-		|-- class-1-images_90
-		|-- class-1-images_180
-		|-- class-1-images_270
-		|-- class-2-images_0
-		|-- class-2-images_90
-		|-- ...
-		|-- class-n-images_270
+		|-- 0
+  		|-- 90
+    		|-- 180
+      		|-- 270
 """
 
 def generate_images(path, dest_path):
