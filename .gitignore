@@ -9,3 +9,6 @@ token.txt
 data-generation/
 
 test.py
+
+__pycache__
+models/__pycache__
