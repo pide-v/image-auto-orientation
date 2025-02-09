@@ -27,6 +27,8 @@ def build_model_01(input_shape, num_classes):
     model.add(Dense(128, activation='relu'))
     model.add(Dense(num_classes, activation='softmax'))
 
+    model.summary()
+
     return model
 
 
