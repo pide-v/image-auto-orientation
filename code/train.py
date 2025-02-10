@@ -44,6 +44,7 @@ def train_model(model, optimizer, loss, batch_size, epochs, x_train, y_train, x_
     return score, total_time
 
 
+'''
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("Uso: python train.py nome_modello")
@@ -57,7 +58,7 @@ if __name__ == "__main__":
         train_model(modello.build_model1)
     except ModuleNotFoundError:
         print(f"Errore: il modello '{model_name}' non esiste.")
-    
+'''
 
 
 
