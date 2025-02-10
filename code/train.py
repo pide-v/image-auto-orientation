@@ -38,13 +38,14 @@ channels = 3
 batch_size = 128
 epochs = 50
 
+print("\n\n\nprima del generate dataset\n\n\n")
 x, y = generate_dataset(dataset_path, image_size, channels)
-
+print("\n\n\ndopo del generate dataset\n\n\n")
 x_train, x_val, y_train, y_val = train_test_split(x, y, test_size=0.2, random_state=42)
+print("\n\n\ndopo lo split\n\n\n")
 
-
-
-def train_model(model, optimizer, loss, batch_size, epochs, x_train, y_train, x_test, y_test):
+'''
+def train_model(model, optimizer, loss, batch_size, epochs, x_train, y_train, x_, y_test):
     start = time()
     
     model.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
@@ -61,6 +62,8 @@ def train_model(model, optimizer, loss, batch_size, epochs, x_train, y_train, x_
 
 
 '''
+
+'''
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("Uso: python train.py nome_modello")
@@ -75,6 +78,4 @@ if __name__ == "__main__":
     except ModuleNotFoundError:
         print(f"Errore: il modello '{model_name}' non esiste.")
 '''
-
-
 
