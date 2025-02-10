@@ -37,5 +37,3 @@ def build_model_02(input_shape, num_classes):
     model=Sequential()
     model.add(Input(shape=input_shape))
 
-    model.add
-

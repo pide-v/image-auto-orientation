@@ -1,10 +1,12 @@
 import tensorflow as tf
 import sys
+from sklearn.model_selection import train_test_split
 
+import numpy  as np
 import matplotlib.pyplot as plt
 
 from time import time
-import utils as utils
+from utils import generate_dataset
 
 
 def plot_loss(history):
@@ -26,6 +28,20 @@ def plot_accuracy(history):
   plt.plot(x_plot, history.history['accuracy'])
   plt.plot(x_plot, history.history['val_accuracy'])
   plt.legend(['Training', 'Validation'])
+  
+  
+dataset_path = "Desktop/data-generation/mock-dataset"
+
+image_size = (426,320)
+channels = 3
+
+batch_size = 128
+epochs = 50
+
+x, y = generate_dataset(dataset_path, image_size, channels)
+
+x_train, x_val, y_train, y_val = train_test_split(x, y, test_size=0.2, random_state=42)
+
 
 
 def train_model(model, optimizer, loss, batch_size, epochs, x_train, y_train, x_test, y_test):
