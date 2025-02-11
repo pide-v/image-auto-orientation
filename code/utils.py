@@ -74,6 +74,28 @@ def generate_dataset(path, image_size, channels=3):
 
 	return x, y
 
+"""
+generate_dataset_splits divides the dataset in chunks and saves two .npy files for each chunk.
+(one for sample and one for labels). The directory structure is the following:
+
+	dataset
+		|-- 0
+		|-- 90
+		|-- 180
+		|-- 270
+		|-- npy
+			 |-- x0.npy
+			 |-- y0.npy
+			 |-- ...
+			 |-- xn.npy
+			 |-- yn.npy
+
+	make sure to call this function once 0, 90, 180, 270 have been generated. folder /npy
+	is automatically generated.
+
+	@param chunk_size defines the number of samples for each chunk.
+
+"""
 def generate_dataset_splits(path, image_size, channels=3, chunk_size=10000):
 	name = 'GENERATE_DATASET_SPLITS'
 
@@ -122,6 +144,20 @@ def generate_dataset_splits(path, image_size, channels=3, chunk_size=10000):
 		np.save(f, y)
 
 
+"""
+function load_dataset_split return two numpy arrays x, y from the splits previously
+saved using generate_dataset_splits. 
+
+@param split defines which split to return. split=4 means that x4 and y4 will be loaded.
+
+@example
+for i in range(len(os.listdir(f'{path}/npy'))//2):
+	x, y = ut.load_dataset_split(path, i)
+	# Training ...
+
+this is a convenient way of using this function.
+
+"""
 def load_dataset_split(path, split):
 	try:
 		print(f'Loading split {split}...')
