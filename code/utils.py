@@ -7,6 +7,8 @@ import numpy as np
 from PIL import Image
 import tensorflow as tf
 
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' # set tf log to error only
+
 """
 Directory at path must have the following structure:
 my-images 
@@ -71,3 +73,63 @@ def generate_dataset(path, image_size, channels=3):
 		y[i] = label[0]
 
 	return x, y
+
+def generate_dataset_splits(path, image_size, channels=3, chunk_size=10000):
+	name = 'GENERATE_DATASET_SPLITS'
+
+	data = tf.keras.utils.image_dataset_from_directory(path, batch_size=1, image_size=image_size)
+	data_iter = data.as_numpy_iterator()
+	size = sum(1 for _ in data)
+
+	print(f'{name}: Saving {size} samples.')
+
+	data = tf.keras.utils.image_dataset_from_directory(path, batch_size=1, image_size=image_size)
+
+	n_chunks = size // chunk_size
+	exc_samples = size % chunk_size
+
+	os.makedirs(f"{path}/npy", exist_ok=True)
+	print(f'{name}: Saving {n_chunks} chunks of size {chunk_size}.')
+	for i in range(n_chunks):
+		x = np.zeros((chunk_size, image_size[0], image_size[1], channels), dtype=np.uint8)
+		y = np.zeros((chunk_size), dtype=np.uint8)
+		for j in range(chunk_size):
+			try:
+				sample = next(data_iter)
+			except StopIteration:
+				break
+			x[j] = sample[0][0]
+			y[j] = sample[1][0]
+
+		with open(f'{path}/npy/x{i}.npy', 'wb') as f:
+			np.save(f, x)
+		with open(f'{path}/npy/y{i}.npy', 'wb') as f:
+			np.save(f, y)
+
+	print(f'{name}: Saving {exc_samples} exceeding samples.')
+	x = np.zeros((exc_samples, image_size[0], image_size[1], channels), dtype=np.uint8)
+	y = np.zeros((exc_samples), dtype=np.uint8)
+	for i in range(exc_samples):
+		try:
+			sample = next(data_iter)
+		except StopIteration:
+			break
+		x[i] = sample[0][0]
+		y[i] = sample[1][0]
+	with open(f'{path}/npy/x{n_chunks}.npy', 'wb') as f:
+		np.save(f, x)
+	with open(f'{path}/npy/y{n_chunks}.npy', 'wb') as f:
+		np.save(f, y)
+
+
+def load_dataset_split(path, split):
+	try:
+		print(f'Loading split {split}...')
+		x = np.load(f'{path}/npy/x{split}.npy')
+		y = np.load(f'{path}/npy/y{split}.npy')
+		return x, y
+	except FileNotFoundError:
+		print(name, 'Split does not exists. Check indexs')
+
+
+

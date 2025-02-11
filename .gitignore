@@ -10,6 +10,7 @@ images/
 ss-dataset/
 
 test.py
+code/chunktest.py
 
 __pycache__
 code/__pycache__
