@@ -1,10 +1,13 @@
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' # set tf log to error only
+
 import tensorflow as tf
 from tensorflow import keras
 
 from tensorflow.keras import layers, Sequential, regularizers
 from tensorflow.keras.layers import Input, Dense, Flatten, Conv2D, MaxPooling2D, Dropout
 
-from tensroflow.keras.regularizers import l2
+from tensorflow.keras.regularizers import l2
 
 
 # first simple model
