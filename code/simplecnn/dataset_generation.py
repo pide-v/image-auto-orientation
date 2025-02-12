@@ -7,7 +7,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' # set tf log to error only
 import utils as utils
 
 '''
-Run this file to generate dataset in the folder mock-dataset
+Run this file to generate dataset in the folder mock-dataset and to save in the folder .npy the numpy arrays
 '''
 
 img_path = "Desktop/data-generation/images"

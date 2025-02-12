@@ -36,14 +36,11 @@ channels = 3
 batch_size = 128
 epochs = 50
 
-def train_model(model, optimizer, loss, batch_size, epochs, x_train, y_train):
-    start = time()
-    
-    model.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
-    model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, validation_split=0.2)
-
-    total_time = start - time()
-    return total_time
+def train_model(model, batch_size, epochs, x_train, y_train):  
+  start = time()
+  model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, validation_split=0.2)
+  total_time = start - time()
+  return total_time
 
 def evaluate_model(model, x_test, y_test):   
   plot_loss(model.history)

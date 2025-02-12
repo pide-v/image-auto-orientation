@@ -20,11 +20,17 @@ dest_path = "Desktop/data-generation/mock-dataset"
 
 # print("Models list: \nmodel_01 \nmodel_02 \n")
 # model = input("Please insert the model you would like to train: ")
+
 x_test_final = []
 y_test_final = []
 total_time = 0
 
+optimizer = 'adam'
+loss = "categorical_crossentropy"
+
 model = models.build_model_01((426,320, 3), 4)
+
+model.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
 
 for i in range(len(os.listdir(f'{dest_path}/npy'))//2):
     print(f"Working with the {i}th chunk:\n")
@@ -36,7 +42,7 @@ for i in range(len(os.listdir(f'{dest_path}/npy'))//2):
     x_test_final.append(x_test)
     y_test_final.append(y_test)
     
-    total_time += train.train_model(model, "adam", "categorical_crossentropy", 128, 50, x_train, y_train)
+    total_time += train.train_model(model, 128, 50, x_train, y_train)
 
 model_score = train.evaluate_model(model, x_test_final, y_test_final)
 print('Test loss:', model_score[0])
