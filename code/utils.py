@@ -3,11 +3,14 @@ utils.py contains some basic utility functions
 """
 
 import os
+import shutil
+import random
 import numpy as np
 from PIL import Image
-import tensorflow as tf
+
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' # set tf log to error only
+import tensorflow as tf
 
 """
 Directory at path must have the following structure:
@@ -29,22 +32,21 @@ This rotated images and the original one are saved in the dest_path in the follo
 
 def generate_images(path, dest_path):
 	classes = [f for f in os.listdir(path) if not f.startswith('.')]
-	print(f'Found {len(classes)} classes: {classes}')
+	print(f'utils/generate_images: Found {len(classes)} classes: {classes}')
 
 
 	for rot in [0, 90, 180, 270]:
 		try:
 			os.mkdir(f'{dest_path}/{rot}')
 		except FileExistsError:
-			print(f'generate-dataset.py: Directory {dest_path}/{rot} already exists. Make sure the destination folder is empty before starting. Aborting...')
+			print(f'utils/generate_images: Directory {dest_path}/{rot} already exists. Make sure the destination folder is empty before starting. Aborting...')
 			break
 		for folder in classes:
-			print(f'Saving images of class {folder} at {rot} degrees...')
+			print(f'utils/generate_images: Saving images of class {folder} at {rot} degrees...')
 			for im in os.listdir(f'{path}/{folder}'):
 				img = Image.open(f'{path}/{folder}/{im}')
 				rot_img = img.rotate(rot)
 				rot_img.save(f'{dest_path}/{rot}/{im[:-5]}_{rot}.JPEG')
-
 
 """
 generate_dataset returns two numpy arrays x, y of shape (N, w, h, c) and (N,).
@@ -97,7 +99,7 @@ generate_dataset_splits divides the dataset in chunks and saves two .npy files f
 
 """
 def generate_dataset_splits(path, image_size, channels=3, chunk_size=10000):
-	name = 'GENERATE_DATASET_SPLITS'
+	name = 'utils/generate_dataset_splits'
 
 	data = tf.keras.utils.image_dataset_from_directory(path, batch_size=1, image_size=image_size)
 	data_iter = data.as_numpy_iterator()
@@ -105,7 +107,7 @@ def generate_dataset_splits(path, image_size, channels=3, chunk_size=10000):
 
 	print(f'{name}: Saving {size} samples.')
 
-	data = tf.keras.utils.image_dataset_from_directory(path, batch_size=1, image_size=image_size)
+	data = tf.keras.utils.image_dataset_from_directory(path, batch_size=1, image_size=image_size, shuffle=True)
 
 	n_chunks = size // chunk_size
 	exc_samples = size % chunk_size
@@ -128,20 +130,21 @@ def generate_dataset_splits(path, image_size, channels=3, chunk_size=10000):
 		with open(f'{path}/npy/y{i}.npy', 'wb') as f:
 			np.save(f, y)
 
-	print(f'{name}: Saving {exc_samples} exceeding samples.')
-	x = np.zeros((exc_samples, image_size[0], image_size[1], channels), dtype=np.uint8)
-	y = np.zeros((exc_samples), dtype=np.uint8)
-	for i in range(exc_samples):
-		try:
-			sample = next(data_iter)
-		except StopIteration:
-			break
-		x[i] = sample[0][0]
-		y[i] = sample[1][0]
-	with open(f'{path}/npy/x{n_chunks}.npy', 'wb') as f:
-		np.save(f, x)
-	with open(f'{path}/npy/y{n_chunks}.npy', 'wb') as f:
-		np.save(f, y)
+	if exc_samples != 0:
+		print(f'{name}: Saving {exc_samples} exceeding samples.')
+		x = np.zeros((exc_samples, image_size[0], image_size[1], channels), dtype=np.uint8)
+		y = np.zeros((exc_samples), dtype=np.uint8)
+		for i in range(exc_samples):
+			try:
+				sample = next(data_iter)
+			except StopIteration:
+				break
+			x[i] = sample[0][0]
+			y[i] = sample[1][0]
+		with open(f'{path}/npy/x{n_chunks}.npy', 'wb') as f:
+			np.save(f, x)
+		with open(f'{path}/npy/y{n_chunks}.npy', 'wb') as f:
+			np.save(f, y)
 
 
 """
@@ -160,12 +163,42 @@ this is a convenient way of using this function.
 """
 def load_dataset_split(path, split):
 	try:
-		print(f'Loading split {split}...')
+		print(f'utils/load_dataset_split: Loading split {split}...')
 		x = np.load(f'{path}/npy/x{split}.npy')
 		y = np.load(f'{path}/npy/y{split}.npy')
 		return x, y
 	except FileNotFoundError:
-		print("load_dataset_split: Split does not exists. Check indexs")
+		print(name, 'utils/load_dataset_split: Split does not exists. Check indexs')
 
 
+"""
+Useless function. solution to a problem that never existed :/
+"""
+
+def dataset_from_directory(path, dest_path=0):
+	#given n classes
+	#create temp directory with n folders
+	#for each image in original folder, copy it to a random temp folder
+	#generate_images on temp folder
+	#delete temp folder
+	#generate npy as usual
+	if dest_path == 0:
+		os.mkdir(f'{path}/dataset')
+
+	classes = [f for f in os.listdir(path) if not f.startswith('.')]
+	images = []
+
+	os.mkdir(f'{path}/temp')
+	for folder in classes:
+		os.mkdir(f'{path}/temp/{folder}')
+
+	for folder in classes:
+		for image in os.listdir(f'{path}/{folder}'):
+			dest_folder = random.choice(classes)
+			shutil.copy(f'{path}/{folder}/{image}', f'{path}/temp/{dest_folder}')
+
+	generate_images(f'{path}/temp', dest_path)
+	generate_dataset_splits(dest_path, (213, 160), chunk_size=10)
+
+	shutil.rmtree(f'{path}/temp')
 
