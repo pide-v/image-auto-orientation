@@ -11,6 +11,7 @@ ss-dataset/
 
 test.py
 code/chunktest.py
+code/randomtest.py
 
 __pycache__
 code/__pycache__
