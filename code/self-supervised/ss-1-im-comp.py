@@ -25,13 +25,11 @@ ut.generate_images('/home/pide/aml/image-auto-orientation/images/single-class',
 
 ### DATA PREPARATION ###
 path = '/home/pide/aml/image-auto-orientation/ss-dataset'
-x,y = ut.generate_dataset(path, (160, 160))
+x,y = ut.generate_dataset(path, (213, 160))
 
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.1, random_state=77)
 x_train = x_train.astype('float32') / 255
 x_test = x_test.astype('float32') / 255
 print(f'Training set shape: {x_train.shape}')
 print(f'Test set shape: {x_test.shape}')
-
-#TODO: We must load training set in batches, or it will be too much for the RAM.
 

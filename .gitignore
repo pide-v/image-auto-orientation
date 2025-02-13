@@ -6,6 +6,9 @@ token.txt
 *.tgz
 *.DS_Store
 
+*.h5
+*.pth
+
 images/
 ss-dataset/
 

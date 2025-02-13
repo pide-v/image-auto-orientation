@@ -168,7 +168,7 @@ def load_dataset_split(path, split):
 		y = np.load(f'{path}/npy/y{split}.npy')
 		return x, y
 	except FileNotFoundError:
-		print(name, 'utils/load_dataset_split: Split does not exists. Check indexs')
+		print(name, 'utils/load_dataset_split: Split does not exists. Check indices')
 
 
 """
