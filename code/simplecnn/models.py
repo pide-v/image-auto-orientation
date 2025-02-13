@@ -15,19 +15,21 @@ def build_model_01(input_shape, num_classes):
     model = Sequential()
     model.add(Input(shape=input_shape))
 
-    model.add(Conv2D(64, kernel_size=(3,3), activation='relu'))
+    model.add(Conv2D(16, kernel_size=(3,3), activation='relu'))
+    model.add(MaxPooling2D(pool_size=(2,2)))
     model.add(MaxPooling2D(pool_size=(2,2)))
 
-    model.add(Conv2D(128, kernel_size=(3,3), activation='relu'))
+    model.add(Conv2D(32, kernel_size=(3,3), activation='relu'))
+    model.add(MaxPooling2D(pool_size=(2,2)))
     model.add(MaxPooling2D(pool_size=(2,2)))
 
-    model.add(Conv2D(256, kernel_size=(3,3), activation='relu'))
-    model.add(MaxPooling2D(pool_size=(2,2)))
+    #model.add(Conv2D(256, kernel_size=(3,3), activation='relu'))
+    #model.add(MaxPooling2D(pool_size=(2,2)))
 
     model.add(Flatten())
 
-    model.add(Dense(512, activation='relu'))
-    model.add(Dense(128, activation='relu'))
+    model.add(Dense(32, activation='relu'))
+    model.add(Dense(16, activation='relu'))
     model.add(Dense(num_classes, activation='softmax'))
 
     model.summary()
