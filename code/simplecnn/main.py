@@ -54,11 +54,7 @@ model = models.build_model_02((320,320, 3), 4)
 
 model.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
 
-history = model.fit(
-    train_generator,
-    validation_data=val_generator,
-    epochs=10
-)
+history = model.fit(train_generator, validation_data=val_generator, epochs=10)
 
 model.save("resnet_orientation.h5")
 
