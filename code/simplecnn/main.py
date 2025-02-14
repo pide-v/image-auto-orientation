@@ -1,59 +1,81 @@
 import models as models
 from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
 
 from tensorflow import keras
 import numpy as np
 
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+
 import os
 
 import sys
-sys.path.append('/Users/stefa_ypsvwdy/Desktop/University/image-auto-orientation/code')
+sys.path.append("/Users/stefa/Desktop/University/AML/image-auto-orientation/code")
 
-import train 
-import utils
+import graph
 
-"""
-Here you can choose which model to train from the list and then evaluate it
-"""
+train_path = "../../../data-generation/dataset/train"
 
-dest_path = "../../data-generation/mock-dataset"
+test_path = "../../../data-generation/dataset/test"
 
-# print("Models list: \nmodel_01 \nmodel_02 \n")
-# model = input("Please insert the model you would like to train: ")
+train_datagen = ImageDataGenerator(
+    rescale=1./255,
+    horizontal_flip=True,
+    validation_split=0.2
+)
 
-x_test_final = []
-y_test_final = []
-total_time = 0
+train_generator = train_datagen.flow_from_directory(
+    train_path,
+    target_size=(320, 320),
+    batch_size=32,
+    class_mode="sparse",
+    subset="training"
+)
+
+val_generator = train_datagen.flow_from_directory(
+    train_path,
+    target_size=(320, 320),
+    batch_size=32,
+    class_mode="sparse",
+    subset="validation"
+)
+
+# images, labels = next(train_generator)
+
+# plt.imshow(images[0].astype("uint8"))
+# plt.axis("off")
+# plt.title(f"Label: {labels[0]}")
+# plt.show()
 
 optimizer = 'adam'
-loss = "categorical_crossentropy"
+loss = "sparse_categorical_crossentropy"
 
-model = models.build_model_01((426,320, 3), 4)
+model = models.build_model_02((320,320, 3), 4)
 
 model.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
 
-j = 0
-num_chunks = len(os.listdir(f'{dest_path}/npy')) // 2
+history = model.fit(
+    train_generator,
+    validation_data=val_generator,
+    epochs=10
+)
 
-print("before training\n\n")
-while j < 15:
-    for i in range(num_chunks):
-        
-        print(f"Working with the {i}th chunk:\n")
-        
-        x, y = utils.load_dataset_split(dest_path, i)
-        x = x.astype('float32')/255
-        y = keras.utils.to_categorical(y, 4)
-        
-        x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.1, random_state = 42)
-        x_test_final.append(x_test)
-        y_test_final.append(y_test)
-        
-        total_time += train.train_model(model, 512, 1, x_train, y_train)
-        del x, y, x_train, x_test, y_train, y_test
-    j += 1
-    
-print("After training")
-model_score = train.evaluate_model(model, x_test_final, y_test_final)
-print('Test loss:', model_score[0])
-print('Test accuracy:', model_score[1])
+model.save("resnet_orientation.h5")
+
+graph.plot_accuracy(history)
+graph.plot_loss(history)
+
+test_datagen = ImageDataGenerator(rescale=1./255)
+
+test_generator = test_datagen.flow_from_directory(
+    test_path,
+    target_size=(320, 320),
+    batch_size=32,
+    class_mode="sparse",
+    shuffle=False
+)
+
+test_loss, test_acc = model.evaluate(test_generator, verbose=1)
+
+print(f"Test Loss: {test_loss:.4f}")
+print(f"Test Accuracy: {test_acc:.4f}")

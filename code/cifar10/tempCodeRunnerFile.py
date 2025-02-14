@@ -1,0 +1,1 @@
+"\Users\stefa\Desktop\University\AML\image-auto-orientation\code"
