@@ -1,4 +1,5 @@
 import models as models
+
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 
@@ -11,8 +12,6 @@ import os
 
 import sys
 sys.path.append("/Users/stefa/Desktop/University/AML/image-auto-orientation/code")
-
-import graph
 
 train_path = "../../../data-generation/dataset/train"
 
@@ -50,7 +49,7 @@ val_generator = train_datagen.flow_from_directory(
 optimizer = 'adam'
 loss = "sparse_categorical_crossentropy"
 
-model = models.build_model_02((320,320, 3), 4)
+model = models.build_model_03((320,320, 3), 4)
 
 model.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
 
