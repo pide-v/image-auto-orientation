@@ -1,24 +1,21 @@
 import sys
-sys.path.append("/Users/stefa/Desktop/University/AML/image-auto-orientation/code")
+sys.path.append('/home/pide/aml/image-auto-orientation/code/')
+
+import utils
 
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' # set tf log to error only
 
-import utils
+train_path = '/home/pide/aml/image-auto-orientation/images/imagenette2-320/train'
+test_path = '/home/pide/aml/image-auto-orientation/images/imagenette2-320/val'
 
-'''
-Run this file to generate dataset in the folder mock-dataset and to save in the folder .npy the numpy arrays
-'''
+#generate dataset with 50% of images at 0 and the other 50% at a random rotation
+utils.generate_images_diff(train_path, '/home/pide/aml/image-auto-orientation/split-dataset/train')
+utils.generate_images_diff(test_path, '/home/pide/aml/image-auto-orientation/split-dataset/test')
 
-img_path_train = "../../../data-generation/images/train"
-dest_path_train = "../../../data-generation/dataset/train"
-
-img_path_test = "../../../data-generation/images/test"
-dest_path_test = "../../../data-generation/dataset/test"
-
-#utils.generate_images(img_path_train, dest_path_train)
-
-utils.generate_images(img_path_test, dest_path_test)
+#generate dataset with 50% of images at 0 and the other 50% at a random rotation. then 15% of images in 0 are copied in 
+#0 with a random rotation 
+utils.generate_images_dupl(train_path, '/home/pide/aml/image-auto-orientation/dupl-dataset/train', 0.15)
+utils.generate_images_dupl(test_path, '/home/pide/aml/image-auto-orientation/dupl-dataset/test', 0.15)
 
 
-#utils.generate_dataset_splits(dest_path, (426,320), channels=3, chunk_size=5000)

@@ -7,7 +7,8 @@ import shutil
 import random
 import numpy as np
 from PIL import Image
-
+import matplotlib.pyplot as plt
+from tensorflow.keras.models import save_model
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' # set tf log to error only
 import tensorflow as tf
@@ -30,23 +31,70 @@ This rotated images and the original one are saved in the dest_path in the follo
       	|-- 270
 """
 
-def generate_images(path, dest_path):
-	classes = [f for f in os.listdir(path) if not f.startswith('.')]
-	print(f'utils/generate_images: Found {len(classes)} classes: {classes}')
+def generate_images_diff(input_folder, output_folder):
+	print(f'utils.py/generate_images: processing images...')
+	os.makedirs(os.path.join(output_folder, '0'), exist_ok=True)
+	os.makedirs(os.path.join(output_folder, '1'), exist_ok=True)
 
+	for subfolder in os.listdir(input_folder):
+		subfolder_path = os.path.join(input_folder, subfolder)
+		if os.path.isdir(subfolder_path):
+			images = [f for f in os.listdir(subfolder_path) if f.lower().endswith(('JPEG', 'jpg', 'jpeg'))]
+			random.shuffle(images)
 
-	for rot in [0, 90, 180, 270]:
-		try:
-			os.mkdir(f'{dest_path}/{rot}')
-		except FileExistsError:
-			print(f'utils/generate_images: Directory {dest_path}/{rot} already exists. Make sure the destination folder is empty before starting. Aborting...')
-			break
-		for folder in classes:
-			print(f'utils/generate_images: Saving images of class {folder} at {rot} degrees...')
-			for im in os.listdir(f'{path}/{folder}'):
-				img = Image.open(f'{path}/{folder}/{im}')
-				rot_img = img.rotate(rot)
-				rot_img.save(f'{dest_path}/{rot}/{im[:-5]}_{rot}.JPEG')
+			half = len(images) // 2
+
+			for img in images[:half]:
+				src_path = os.path.join(subfolder_path, img)
+				dest_path = os.path.join(output_folder, '0', img)
+				shutil.copy(src_path, dest_path)
+
+			for img in images[half:]:
+				src_path = os.path.join(subfolder_path, img)
+				dest_path = os.path.join(output_folder, '1', img)
+
+				image = Image.open(src_path)
+				angle = random.choice([90, 180, 270])
+				rotated_image = image.rotate(angle)
+				rotated_image.save(dest_path)
+
+def generate_images_dupl(input_folder, output_folder, duplicate_ratio):
+	print(f'utils.py/generate_images: processing images...')
+	os.makedirs(os.path.join(output_folder, '0'), exist_ok=True)
+	os.makedirs(os.path.join(output_folder, '1'), exist_ok=True)
+
+	for subfolder in os.listdir(input_folder):
+		subfolder_path = os.path.join(input_folder, subfolder)
+		if os.path.isdir(subfolder_path):
+			images = [f for f in os.listdir(subfolder_path) if f.lower().endswith(('png', 'jpg', 'jpeg'))]
+			random.shuffle(images)
+
+			half = len(images) // 2
+			duplicate_count = int(len(images) * duplicate_ratio)
+
+			for img in images[:half]:
+				src_path = os.path.join(subfolder_path, img)
+				dest_path = os.path.join(output_folder, '0', img)
+				shutil.copy(src_path, dest_path)
+
+			for img in images[half:]:
+				src_path = os.path.join(subfolder_path, img)
+				dest_path = os.path.join(output_folder, '1', img)
+
+				image = Image.open(src_path)
+				angle = random.choice([90, 180, 270])
+				rotated_image = image.rotate(angle)
+				rotated_image.save(dest_path)
+
+			duplicate_images = random.sample(images[:half], min(duplicate_count, len(images[:half])))
+			for img in duplicate_images:
+				src_path = os.path.join(subfolder_path, img)
+				dest_path = os.path.join(output_folder, '1', img)
+
+				image = Image.open(src_path)
+				angle = random.choice([90, 180, 270])
+				rotated_image = image.rotate(angle)
+				rotated_image.save(dest_path)
 
 """
 generate_dataset returns two numpy arrays x, y of shape (N, w, h, c) and (N,).
@@ -201,4 +249,50 @@ def dataset_from_directory(path, dest_path=0):
 	generate_dataset_splits(dest_path, (213, 160), chunk_size=10)
 
 	shutil.rmtree(f'{path}/temp')
+
+def save_model_and_metrics(model, n_params, train_time, history, test_acc, dataset, dest_path, name):
+    # Crea la cartella di destinazione completa
+    save_dir = os.path.join(dest_path, name)
+    os.makedirs(save_dir, exist_ok=True)
+    
+    # Salva il modello Keras
+    model_path = os.path.join(save_dir, f'{name}_model.h5')
+    save_model(model, model_path)
+    
+    # Salva il numero di parametri
+    params_path = os.path.join(save_dir, f'{name}_params.txt')
+    with open(params_path, 'w') as f:
+        f.write(f'Number of parameters: {n_params}\n')
+        f.write(f'Training time: {train_time} seconds\n')
+        f.write(f'Test accuracy: {test_acc}\n')
+        f.write(f'Training dataset: {dataset}\n')
+
+    # Estrai e salva i grafici per 'train_loss' vs 'val_loss' e 'train_acc' vs 'val_acc'
+    plt.figure(figsize=(12, 6))
+    
+    # Grafico per 'train_loss' e 'val_loss'
+    plt.subplot(1, 2, 1)
+    plt.plot(history.history['loss'], label='Train Loss')
+    plt.plot(history.history['val_loss'], label='Validation Loss')
+    plt.title('Train Loss vs Validation Loss')
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.legend()
+    
+    # Grafico per 'train_acc' e 'val_acc'
+    plt.subplot(1, 2, 2)
+    plt.plot(history.history['accuracy'], label='Train Accuracy')
+    plt.plot(history.history['val_accuracy'], label='Validation Accuracy')
+    plt.title('Train Accuracy vs Validation Accuracy')
+    plt.xlabel('Epochs')
+    plt.ylabel('Accuracy')
+    plt.legend()
+
+    # Salva il grafico
+    plot_path = os.path.join(save_dir, f'{name}_training_plots.png')
+    plt.tight_layout()
+    plt.savefig(plot_path)
+    plt.close()
+
+    print(f'Model and metrics saved to {save_dir}')
 

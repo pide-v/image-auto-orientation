@@ -1,32 +1,43 @@
+import sys
+sys.path.append('/home/pide/aml/image-auto-orientation/code/')
+import utils as ut
+
 import models as models
 
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 
+import tensorflow as tf
 from tensorflow import keras
 import numpy as np
 
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
-import os
+import time
 
-import sys
-sys.path.append("/Users/stefa/Desktop/University/AML/image-auto-orientation/code")
+dataset = 'split-dataset'
 
-train_path = "../../../data-generation/dataset/train"
+train_path = f'/home/pide/aml/image-auto-orientation/{dataset}/train'
+test_path = f'/home/pide/aml/image-auto-orientation/{dataset}/test'
 
-test_path = "../../../data-generation/dataset/test"
+gpus = tf.config.experimental.list_physical_devices('GPU')
+if gpus:
+    try:
+        for gpu in gpus:
+            tf.config.experimental.set_memory_growth(gpu, True)
+    except RuntimeError as e:
+        print(e)
+
 
 train_datagen = ImageDataGenerator(
     rescale=1./255,
-    horizontal_flip=True,
     validation_split=0.2
 )
 
 train_generator = train_datagen.flow_from_directory(
     train_path,
     target_size=(320, 320),
-    batch_size=32,
+    batch_size=8,
     class_mode="sparse",
     subset="training"
 )
@@ -34,38 +45,31 @@ train_generator = train_datagen.flow_from_directory(
 val_generator = train_datagen.flow_from_directory(
     train_path,
     target_size=(320, 320),
-    batch_size=32,
+    batch_size=8,
     class_mode="sparse",
     subset="validation"
 )
 
-# images, labels = next(train_generator)
-
-# plt.imshow(images[0].astype("uint8"))
-# plt.axis("off")
-# plt.title(f"Label: {labels[0]}")
-# plt.show()
 
 optimizer = 'adam'
 loss = "sparse_categorical_crossentropy"
 
-model = models.build_model_03((320,320, 3), 4)
+model = models.build_model_04((320,320, 3), 2)
 
 model.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
 
-history = model.fit(train_generator, validation_data=val_generator, epochs=10)
+start = time.time()
+history = model.fit(train_generator, validation_data=val_generator, epochs=25)
+end = time.time()
 
-model.save("resnet_orientation.h5")
-
-graph.plot_accuracy(history)
-graph.plot_loss(history)
+total_time = end - start
 
 test_datagen = ImageDataGenerator(rescale=1./255)
 
 test_generator = test_datagen.flow_from_directory(
     test_path,
     target_size=(320, 320),
-    batch_size=32,
+    batch_size=16,
     class_mode="sparse",
     shuffle=False
 )
@@ -74,3 +78,5 @@ test_loss, test_acc = model.evaluate(test_generator, verbose=1)
 
 print(f"Test Loss: {test_loss:.4f}")
 print(f"Test Accuracy: {test_acc:.4f}")
+
+ut.save_model_and_metrics(model, model.count_params(), total_time, history, test_acc, dataset, '../../trained-models', 'model04')
