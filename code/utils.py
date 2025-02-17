@@ -96,6 +96,28 @@ def generate_images_dupl(input_folder, output_folder, duplicate_ratio):
 				rotated_image = image.rotate(angle)
 				rotated_image.save(dest_path)
 
+def generate_images_full(input_folder, output_folder):
+	print(f'utils.py/generate_images: processing images...')
+	os.makedirs(os.path.join(output_folder, '0'), exist_ok=True)
+	os.makedirs(os.path.join(output_folder, '1'), exist_ok=True)
+
+	for subfolder in os.listdir(input_folder):
+		subfolder_path = os.path.join(input_folder, subfolder)
+		if os.path.isdir(subfolder_path):
+			images = [f for f in os.listdir(subfolder_path) if f.lower().endswith(('png', 'jpg', 'jpeg'))]
+
+			for img in images:
+				src_path = os.path.join(subfolder_path, img)
+				dest_path_0 = os.path.join(output_folder, '0', img)
+				dest_path_1 = os.path.join(output_folder, '1', img)
+
+				shutil.copy(src_path, dest_path_0)
+
+				image = Image.open(src_path)
+				angle = random.choice([90, 180, 270])
+				rotated_image = image.rotate(angle)
+				rotated_image.save(dest_path_1)
+
 """
 generate_dataset returns two numpy arrays x, y of shape (N, w, h, c) and (N,).
 N = number of samples

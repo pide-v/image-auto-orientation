@@ -54,7 +54,7 @@ val_generator = train_datagen.flow_from_directory(
 optimizer = 'adam'
 loss = "sparse_categorical_crossentropy"
 
-model = models.build_model_04((320,320, 3), 2)
+model = models.build_model_07((320,320, 3), 2)
 
 model.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
 
@@ -79,4 +79,4 @@ test_loss, test_acc = model.evaluate(test_generator, verbose=1)
 print(f"Test Loss: {test_loss:.4f}")
 print(f"Test Accuracy: {test_acc:.4f}")
 
-ut.save_model_and_metrics(model, model.count_params(), total_time, history, test_acc, dataset, '../../trained-models', 'model04')
+ut.save_model_and_metrics(model, model.count_params(), total_time, history, test_acc, dataset, '../../trained-models', 'model07')
