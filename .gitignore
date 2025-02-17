@@ -9,9 +9,14 @@ token.txt
 *.h5
 *.pth
 
-images/
-ss-dataset/
+*.run
 
+images/
+split-dataset/
+dupl-dataset/
+trained-models/
+
+gputest.py
 test.py
 code/chunktest.py
 code/randomtest.py
