@@ -26,7 +26,7 @@ train_datagen = ImageDataGenerator(
 train_generator = train_datagen.flow_from_directory(
     train_path,
     target_size=(320, 320),
-    batch_size=32,
+    batch_size=128,
     class_mode="sparse",
     subset="training"
 )
@@ -34,17 +34,10 @@ train_generator = train_datagen.flow_from_directory(
 val_generator = train_datagen.flow_from_directory(
     train_path,
     target_size=(320, 320),
-    batch_size=32,
+    batch_size=128,
     class_mode="sparse",
     subset="validation"
 )
-
-# images, labels = next(train_generator)
-
-# plt.imshow(images[0].astype("uint8"))
-# plt.axis("off")
-# plt.title(f"Label: {labels[0]}")
-# plt.show()
 
 optimizer = 'adam'
 loss = "sparse_categorical_crossentropy"
@@ -57,15 +50,15 @@ history = model.fit(train_generator, validation_data=val_generator, epochs=10)
 
 model.save("resnet_orientation.h5")
 
-graph.plot_accuracy(history)
-graph.plot_loss(history)
+models.plot_accuracy(history)
+models.plot_loss(history)
 
 test_datagen = ImageDataGenerator(rescale=1./255)
 
 test_generator = test_datagen.flow_from_directory(
     test_path,
     target_size=(320, 320),
-    batch_size=32,
+    batch_size=128,
     class_mode="sparse",
     shuffle=False
 )
