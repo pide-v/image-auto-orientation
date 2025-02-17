@@ -113,7 +113,8 @@ note: since classes are the folder taken in order we have the following:
 
 """
 def generate_dataset(path, image_size, channels=3):
-	data = tf.keras.utils.image_dataset_from_directory(path, batch_size=1, image_size=image_size)
+	color_mode="grayscale" if channels==1 else "rgb"
+	data = tf.keras.utils.image_dataset_from_directory(path, batch_size=1, image_size=image_size, color_mode=color_mode)
 	size = sum(1 for _ in data)
 	x = np.zeros((size, image_size[0], image_size[1], channels), dtype=np.uint8)
 	y = np.zeros((size), dtype=np.uint8)
