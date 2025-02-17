@@ -50,7 +50,6 @@ val_generator = train_datagen.flow_from_directory(
     subset="validation"
 )
 
-
 optimizer = 'adam'
 loss = "sparse_categorical_crossentropy"
 

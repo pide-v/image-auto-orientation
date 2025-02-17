@@ -43,10 +43,10 @@ def plot_accuracy(history):
 
 
 
-dataset_path = "../../../cifar10"
-x, y = utils.generate_dataset(dataset_path, (32, 32), channels=3)
+dataset_path = "../../../mnist"
+x, y = utils.generate_dataset(dataset_path, (28, 28), channels=1)
 
-plt.imshow(x[12])
+plt.imshow(x[12], cmap='gray')
 plt.show()
 print(f"Example: {y[:100]}")
 
@@ -63,27 +63,21 @@ print(y_test.shape)
 
 print("\nBuild the model: \n")
 
-#model06
-model_01=Sequential()
-model_01.add(Input(shape=(32,32,3)))
+model = Sequential()
+model.add(Input(shape=(28,28,1)))
 
-model_01.add(Conv2D(64, kernel_size=(3,3), activation='relu'))
-model_01.add(Conv2D(64, kernel_size=(3,3), activation='relu'))
+model.add(Conv2D(64, kernel_size=(3,3), activation='relu'))
+model.add(Conv2D(64, kernel_size=(3,3), activation='relu'))
+model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(Dropout(0.25))
 
-model_01.add(MaxPooling2D(pool_size=(2,2)))
-model_01.add(Dropout(0.25))
+model.add(Flatten())
 
-model_01.add(Conv2D(128, kernel_size=(3,3), activation='relu'))
-model_01.add(Conv2D(128, kernel_size=(3,3), activation='relu', kernel_regularizer=l2(0.01)))
+model.add(Dense(128, activation='relu'))
+model.add(Dropout(0.25))
+model.add(Dense(1, activation='sigmoid'))
 
-model_01.add(Flatten())
-
-model_01.add(Dense(128, activation='relu'))
-model_01.add(Dropout(0.25))
-
-model_01.add(Dense(num_classes, activation='sigmoid'))
-
-model_01.summary()
+model.summary()
 
 optimizer = 'adam'
 loss = "binary_crossentropy"
