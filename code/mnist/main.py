@@ -41,7 +41,7 @@ def plot_accuracy(history):
 
 
 
-dataset_path = "../../cifar10/dataset"
+dataset_path = "../../../mnist"
 x, y = utils.generate_dataset(dataset_path, (32,32), channels=3)
 
 plt.imshow(x[12], cmap='gray')
@@ -60,41 +60,37 @@ print(x_test.shape)
 print(y_train.shape)
 print(y_test.shape)
 
-# print("Build the model: \n")
+print("Build the model: \n")
 
-# model = Sequential()
-# model.add(Input(shape=(32,32,3)))
+model = Sequential()
+model.add(Input(shape=(32,32,1)))
 
-# model.add(Conv2D(32, kernel_size=(3,3), activation='relu'))
+model.add(Conv2D(64, kernel_size=(3,3), activation='relu'))
+model.add(Conv2D(64, kernel_size=(3,3), activation='relu'))
+model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(Dropout(0.25))
 
-# model.add(Conv2D(32, kernel_size=(3,3), activation='relu'))
-# model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(Flatten())
 
-# model.add(Conv2D(64, kernel_size=(3,3), activation='relu',  kernel_regularizer=l2(0.01)))
-# model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(Dense(64, activation='relu'))
+model.add(Dropout(0.25))
+model.add(Dense(1, activation='sigmoid'))
 
-# model.add(Flatten())
+model.summary()
 
-# model.add(Dense(64, activation='relu'))
-# model.add(Dropout(0.2))
-# model.add(Dense(4, activation='softmax'))
+optimizer = 'adam'
+loss = "binary_crossentropy"
+batch_size = 32
+epochs = 30
 
-# model.summary()
-
-# optimizer = 'adam'
-# loss = "categorical_crossentropy"
-# batch_size = 128
-# epochs = 20
-
-# model.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
-# model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, validation_split=0.2)
+model.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
+model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, validation_split=0.2)
 
 
-# plot_accuracy(model.history)
-# plot_loss(model.history)
+plot_accuracy(model.history)
+plot_loss(model.history)
 
-# print("After training")
-# model_score = model.evaluate(x_test, y_test)
-# print('Test loss:', model_score[0])
-# print('Test accuracy:', model_score[1])
-
+print("After training")
+model_score = model.evaluate(x_test, y_test)
+print('Test loss:', model_score[0])
+print('Test accuracy:', model_score[1])
