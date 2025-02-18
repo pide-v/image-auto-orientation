@@ -55,7 +55,7 @@ def build_model_01(input_shape, num_classes):
 
     model.add(Dense(32, activation='relu'))
     model.add(Dense(16, activation='relu'))
-    model.add(Dense(num_classes, activation='softmax'))
+    model.add(Dense(num_classes, activation='sigmoid'))
 
     model.summary()
 

@@ -15,10 +15,10 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 import time
 
-dataset = 'split-dataset'
+dataset = 'street-view'
 
-train_path = f'/home/pide/aml/image-auto-orientation/{dataset}/train'
-test_path = f'/home/pide/aml/image-auto-orientation/{dataset}/test'
+train_path = f'/home/pide/aml/image-auto-orientation/datasets/{dataset}/train'
+test_path = f'/home/pide/aml/image-auto-orientation/datasets/{dataset}/test'
 
 gpus = tf.config.experimental.list_physical_devices('GPU')
 if gpus:
@@ -36,29 +36,29 @@ train_datagen = ImageDataGenerator(
 
 train_generator = train_datagen.flow_from_directory(
     train_path,
-    target_size=(320, 320),
+    target_size=(224, 224),
     batch_size=8,
-    class_mode="sparse",
+    class_mode="binary",
     subset="training"
 )
 
 val_generator = train_datagen.flow_from_directory(
     train_path,
-    target_size=(320, 320),
+    target_size=(224, 224),
     batch_size=8,
-    class_mode="sparse",
+    class_mode="binary",
     subset="validation"
 )
 
 optimizer = 'adam'
-loss = "sparse_categorical_crossentropy"
+loss = "binary_crossentropy"
 
-model = models.build_model_07((320,320, 3), 2)
+model = models.build_model_01((224,224, 3), 1)
 
 model.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
 
 start = time.time()
-history = model.fit(train_generator, validation_data=val_generator, epochs=25)
+history = model.fit(train_generator, validation_data=val_generator, epochs=10)
 end = time.time()
 
 total_time = end - start
@@ -67,9 +67,9 @@ test_datagen = ImageDataGenerator(rescale=1./255)
 
 test_generator = test_datagen.flow_from_directory(
     test_path,
-    target_size=(320, 320),
+    target_size=(224, 224),
     batch_size=16,
-    class_mode="sparse",
+    class_mode="binary",
     shuffle=False
 )
 
@@ -78,4 +78,4 @@ test_loss, test_acc = model.evaluate(test_generator, verbose=1)
 print(f"Test Loss: {test_loss:.4f}")
 print(f"Test Accuracy: {test_acc:.4f}")
 
-ut.save_model_and_metrics(model, model.count_params(), total_time, history, test_acc, dataset, '../../trained-models', 'model07')
+ut.save_model_and_metrics(model, model.count_params(), total_time, history, test_acc, dataset, '../../trained-models', 'model01-streetview')

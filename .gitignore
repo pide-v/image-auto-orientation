@@ -5,6 +5,7 @@ token.txt
 *.jpg
 *.tgz
 *.DS_Store
+*.png
 
 *.h5
 *.pth
@@ -15,6 +16,7 @@ images/
 split-dataset/
 dupl-dataset/
 trained-models/
+new-street-view/
 
 gputest.py
 test.py

@@ -31,32 +31,40 @@ This rotated images and the original one are saved in the dest_path in the follo
       	|-- 270
 """
 
+import os
+import random
+import shutil
+from PIL import Image
+
 def generate_images_diff(input_folder, output_folder):
-	print(f'utils.py/generate_images: processing images...')
-	os.makedirs(os.path.join(output_folder, '0'), exist_ok=True)
-	os.makedirs(os.path.join(output_folder, '1'), exist_ok=True)
+    print(f'utils.py/generate_images: processing images...')
+    
+    os.makedirs(os.path.join(output_folder, '0'), exist_ok=True)
+    os.makedirs(os.path.join(output_folder, '1'), exist_ok=True)
 
-	for subfolder in os.listdir(input_folder):
-		subfolder_path = os.path.join(input_folder, subfolder)
-		if os.path.isdir(subfolder_path):
-			images = [f for f in os.listdir(subfolder_path) if f.lower().endswith(('JPEG', 'jpg', 'jpeg'))]
-			random.shuffle(images)
+    for subfolder in os.listdir(input_folder):
+        subfolder_path = os.path.join(input_folder, subfolder)
+        if os.path.isdir(subfolder_path):
+            images = [f for f in os.listdir(subfolder_path) if f.lower().endswith(('png', 'jpeg', 'jpg'))]
+            random.shuffle(images)
 
-			half = len(images) // 2
+            half = len(images) // 2
 
-			for img in images[:half]:
-				src_path = os.path.join(subfolder_path, img)
-				dest_path = os.path.join(output_folder, '0', img)
-				shutil.copy(src_path, dest_path)
+            for img in images[:half]:
+                src_path = os.path.join(subfolder_path, img)
+                new_filename = f"{subfolder}_{img}"  # Aggiunge il nome della sottocartella
+                dest_path = os.path.join(output_folder, '0', new_filename)
+                shutil.copy(src_path, dest_path)
 
-			for img in images[half:]:
-				src_path = os.path.join(subfolder_path, img)
-				dest_path = os.path.join(output_folder, '1', img)
+            for img in images[half:]:
+                src_path = os.path.join(subfolder_path, img)
+                new_filename = f"{subfolder}_{img}"  # Evita conflitti di nome
+                dest_path = os.path.join(output_folder, '1', new_filename)
 
-				image = Image.open(src_path)
-				angle = random.choice([90, 180, 270])
-				rotated_image = image.rotate(angle)
-				rotated_image.save(dest_path)
+                image = Image.open(src_path)
+                angle = random.choice([90, 180, 270])
+                rotated_image = image.rotate(angle, expand=False)
+                rotated_image.convert("RGB").save(dest_path, format="JPEG", quality=85, optimize=True, progressive=True)
 
 def generate_images_dupl(input_folder, output_folder, duplicate_ratio):
 	print(f'utils.py/generate_images: processing images...')

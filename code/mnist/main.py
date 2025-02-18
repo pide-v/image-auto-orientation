@@ -1,6 +1,6 @@
 import sys
-sys.path.append("/Users/stefa/Desktop/University/AML/image-auto-orientation/code")
-import utils
+sys.path.append('/home/pide/aml/image-auto-orientation/code/')
+import utils as ut
 import os
 import matplotlib.pyplot as plt
 
@@ -17,34 +17,8 @@ from sklearn.model_selection import train_test_split
 
 from tensorflow.keras.regularizers import l2
 
-
-
-def plot_loss(history):
-  x_plot = list(range(1,len(history.history["loss"])+1))
-  plt.figure()
-  plt.title("Loss")
-  plt.xlabel('Epochs')
-  plt.ylabel('Loss')
-  plt.plot(x_plot, history.history['loss'])
-  plt.plot(x_plot, history.history['val_loss'])
-  plt.legend(['Training', 'Validation'])
-  plt.show()
-
-def plot_accuracy(history):
-  x_plot = list(range(1,len(history.history["accuracy"])+1))
-  plt.figure()
-  plt.title("Accuracy")
-  plt.xlabel('Epochs')
-  plt.ylabel('Accuracy')
-  plt.plot(x_plot, history.history['accuracy'])
-  plt.plot(x_plot, history.history['val_accuracy'])
-  plt.legend(['Training', 'Validation'])
-  plt.show()  
-
-
-
-dataset_path = "../../../mnist"
-x, y = utils.generate_dataset(dataset_path, (28, 28), channels=1)
+dataset_path = "../../mnist-dataset"
+x, y = ut.generate_dataset(dataset_path, (28, 28), channels=1)
 
 plt.imshow(x[12], cmap='gray')
 plt.show()
@@ -87,15 +61,15 @@ epochs = 15
 model.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
 
 start= time.time()
-model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, validation_split=0.2)
+history = model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, validation_split=0.2)
 total_time = time.time() - start
 
-#SALVA LE COSE
-
-plot_accuracy(model.history)
-plot_loss(model.history)
 
 print("After training")
 model_score = model.evaluate(x_test, y_test)
 print('Test loss:', model_score[0])
 print('Test accuracy:', model_score[1])
+
+
+#SALVA LE COSE
+ut.save_model_and_metrics(model, model.count_params(), total_time, history, model_score[1], 'mnist-dataset', '../../trained-models', 'mnist-model')
