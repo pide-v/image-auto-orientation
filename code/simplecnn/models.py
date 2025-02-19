@@ -41,17 +41,16 @@ def build_model_01(input_shape, num_classes):
 
     model.add(Conv2D(16, kernel_size=(3,3), activation='relu'))
     model.add(MaxPooling2D(pool_size=(2,2)))
-    model.add(MaxPooling2D(pool_size=(2,2)))
+    #model.add(MaxPooling2D(pool_size=(2,2)))
 
     model.add(Conv2D(32, kernel_size=(3,3), activation='relu'))
     model.add(MaxPooling2D(pool_size=(2,2)))
-    model.add(MaxPooling2D(pool_size=(2,2)))
+    #model.add(MaxPooling2D(pool_size=(2,2)))
 
     model.add(Conv2D(64, kernel_size=(3,3), activation='relu'))
     model.add(MaxPooling2D(pool_size=(2,2)))
 
     model.add(Flatten())
-    print(f"Dimensione dopo Flatten: {model.output_shape}")
 
     model.add(Dense(32, activation='relu'))
     model.add(Dense(16, activation='relu'))
@@ -62,102 +61,40 @@ def build_model_01(input_shape, num_classes):
     return model
 
 
-# same structure but with some dropout and l2 regularizations
 def build_model_02(input_shape, num_classes):
     model=Sequential()
     model.add(Input(shape=input_shape))
     
     model.add(Conv2D(64, kernel_size=(3,3), activation='relu'))
+    model.add(Conv2D(64, kernel_size=(3,3), activation='relu'))
     model.add(MaxPooling2D(pool_size=(2,2)))
     model.add(MaxPooling2D(pool_size=(2,2)))
     
+    model.add(Conv2D(128, kernel_size=(3,3), activation='relu', kernel_regularizer=l2(0.01)))
     model.add(Conv2D(128, kernel_size=(3,3), activation='relu'))
     model.add(MaxPooling2D(pool_size=(2,2)))
     model.add(MaxPooling2D(pool_size=(2,2)))
     
+    model.add(Conv2D(256, kernel_size=(3,3), activation='relu', kernel_regularizer=l2(0.01)))
     model.add(Conv2D(256, kernel_size=(3,3), activation='relu'))
     model.add(MaxPooling2D(pool_size=(2,2)))
-    model.add(MaxPooling2D(pool_size=(2,2)))
+    model.add(MaxPooling2D(pool_size=(2,2)))   
     model.add(Flatten())
     
-    model.add(Dense(128, activation='relu'), Dropout)
-    model.add(Dropout(0.2))
-    
-    model.add(Dense(64, activation='relu'))
-    
-    model.add(Dropout(0.2))
-    model.add(Dense(num_classes, activation='softmax'))
-
-    model.summary()
-
-    return model
-
-def build_model_03(input_shape, num_classes):
-    model=Sequential()
-    model.add(Input(shape=input_shape))
-    
-    model.add(Conv2D(64, kernel_size=(3,3), activation='relu'))
-    model.add(Conv2D(64, kernel_size=(3,3), activation='relu'))
-    model.add(MaxPooling2D(pool_size=(2,2)))
-    model.add(MaxPooling2D(pool_size=(2,2)))
-    
-    model.add(Conv2D(128, kernel_size=(3,3), activation='relu'))
-    model.add(Conv2D(128, kernel_size=(3,3), activation='relu'))
-    model.add(MaxPooling2D(pool_size=(2,2)))
-    model.add(MaxPooling2D(pool_size=(2,2)))
-    
-    model.add(Conv2D(256, kernel_size=(3,3), activation='relu'))
-    model.add(Conv2D(256, kernel_size=(3,3), activation='relu'))
-    model.add(MaxPooling2D(pool_size=(2,2)))
-    model.add(MaxPooling2D(pool_size=(2,2)))
-    model.add(Flatten())
-    
-    model.add(Dense(128, activation='relu'), Dropout)
-    model.add(Dropout(0.2))
-    
-    model.add(Dense(64, activation='relu'))
-    
-    model.add(Dropout(0.2))
-    model.add(Dense(num_classes, activation='softmax'))
-
-    model.summary()
-
-    return model
-
-
-def build_model_04(input_shape, num_classes):
-    model=Sequential()
-    model.add(Input(shape=input_shape))
-
-    model.add(Conv2D(32, kernel_size=(3,3), activation='relu'))
-    model.add(Conv2D(32, kernel_size=(3,3), activation='relu'))
-    model.add(MaxPooling2D(pool_size=(2,2)))
-    model.add(MaxPooling2D(pool_size=(2,2)))
-
-    model.add(Conv2D(64, kernel_size=(3,3), activation='relu'))
-    model.add(Conv2D(64, kernel_size=(3,3), activation='relu'))
-    model.add(MaxPooling2D(pool_size=(2,2)))
-    model.add(MaxPooling2D(pool_size=(2,2)))
-
-    model.add(Conv2D(128, kernel_size=(3,3), activation='relu'))
-    model.add(Conv2D(128, kernel_size=(3,3), activation='relu'))
-    model.add(MaxPooling2D(pool_size=(2,2)))
-    model.add(MaxPooling2D(pool_size=(2,2)))
-    model.add(Flatten())
-
-    model.add(Dense(256, activation='relu'), Dropout)
-    model.add(Dropout(0.2))
-
     model.add(Dense(128, activation='relu'))
     model.add(Dropout(0.2))
-
-    model.add(Dense(num_classes, activation='softmax'))
+    
+    model.add(Dense(64, activation='relu'))
+    
+    model.add(Dropout(0.2))
+    model.add(Dense(num_classes, activation='sigmoid'))
 
     model.summary()
-    
+
     return model
 
-def build_model_07(input_shape, num_classes):
+
+def build_model_03(input_shape, num_classes):
     model=Sequential()
     model.add(Input(shape=input_shape))
 
@@ -168,22 +105,22 @@ def build_model_07(input_shape, num_classes):
     model.add(Conv2D(64, kernel_size=(3,3), activation='relu'))
     model.add(Conv2D(64, kernel_size=(3,3), activation='relu'))
     model.add(MaxPooling2D(pool_size=(2,2)))
-    model.add(MaxPooling2D(pool_size=(2,2)))
+    #model.add(MaxPooling2D(pool_size=(2,2)))
 
     model.add(Conv2D(128, kernel_size=(3,3), activation='relu'))
     model.add(Conv2D(128, kernel_size=(3,3), activation='relu', kernel_regularizer=l2(0.01)))
     model.add(MaxPooling2D(pool_size=(2,2)))
-    model.add(MaxPooling2D(pool_size=(2,2)))
+    #model.add(MaxPooling2D(pool_size=(2,2)))
 
     model.add(Flatten())
 
-    model.add(Dense(256, activation='relu'))
-    model.add(Dropout(0.2))
-
     model.add(Dense(128, activation='relu'))
-    model.add(Dropout(0.2))
+    model.add(Dropout(0.25))
 
-    model.add(Dense(num_classes, activation='softmax'))
+    model.add(Dense(64, activation='relu'))
+    model.add(Dropout(0.25))
+
+    model.add(Dense(num_classes, activation='sigmoid'))
 
     model.summary()
     return model

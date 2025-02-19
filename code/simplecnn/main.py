@@ -12,6 +12,7 @@ from tensorflow import keras
 import numpy as np
 
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.callbacks import EarlyStopping
 
 import time
 
@@ -50,15 +51,21 @@ val_generator = train_datagen.flow_from_directory(
     subset="validation"
 )
 
+early_stopping = EarlyStopping(
+    monitor='val_loss',
+    patience=4,
+    restore_best_weights=True
+)
+
 optimizer = 'adam'
 loss = "binary_crossentropy"
 
-model = models.build_model_01((224,224, 3), 1)
+model = models.build_model_03((224,224, 3), 1)
 
 model.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
 
 start = time.time()
-history = model.fit(train_generator, validation_data=val_generator, epochs=10)
+history = model.fit(train_generator, validation_data=val_generator, epochs=30, callbacks=[early_stopping])
 end = time.time()
 
 total_time = end - start
@@ -78,4 +85,4 @@ test_loss, test_acc = model.evaluate(test_generator, verbose=1)
 print(f"Test Loss: {test_loss:.4f}")
 print(f"Test Accuracy: {test_acc:.4f}")
 
-ut.save_model_and_metrics(model, model.count_params(), total_time, history, test_acc, dataset, '../../trained-models', 'model01-streetview')
+ut.save_model_and_metrics(model, model.count_params(), total_time, history, test_acc, dataset, '../../trained-models', 'model03-streetview')

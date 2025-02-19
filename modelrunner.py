@@ -48,7 +48,7 @@ class MLModelGUI:
         )
         if file_path:
             self.image_path = file_path
-            image = Image.open(file_path).resize((224, 224)).convert('RGB')
+            image = Image.open(file_path).resize((32, 32)).convert('RGB')
             photo = ImageTk.PhotoImage(image)
             
             # Mostra l'immagine nella GUI
@@ -57,7 +57,7 @@ class MLModelGUI:
 
     def predict(self):
         if self.model and self.image_path:
-            image = Image.open(self.image_path).resize((224, 224)).convert('RGB')
+            image = Image.open(self.image_path).resize((32, 32)).convert('RGB')
             image_array = np.array(image) / 255.0 
             image_array = np.expand_dims(image_array, axis=0)
             
