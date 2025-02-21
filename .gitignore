@@ -18,7 +18,6 @@ dupl-dataset/
 trained-models/
 new-street-view/
 
-gputest.py
 test.py
 code/chunktest.py
 code/randomtest.py
