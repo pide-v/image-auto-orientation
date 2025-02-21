@@ -1,80 +1,109 @@
-import torch
-import torch.nn as nn
-import torchvision.models as models
-import torch.optim as optim
+import sys
+sys.path.append('/home/pide/aml/image-auto-orientation/code/')
+import utils as ut
 
-from torchvision import datasets, transforms
-from torch.utils.data import DataLoader
+import tensorflow as tf
+from tensorflow.keras.applications import ResNet50
+from tensorflow.keras.layers import Dense, Dropout, GlobalAveragePooling2D, Flatten
+from tensorflow.keras.models import Model
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.callbacks import ReduceLROnPlateau, EarlyStopping
+import matplotlib.pyplot as plt
+import time
 
-model = models.resnet50(pretrained=True)
+train_path = '/home/pide/aml/image-auto-orientation/datasets/cifar10-dataset/train'
+test_path = '/home/pide/aml/image-auto-orientation/datasets/cifar10-dataset/test'
 
-#replacing resnet's fc layer (1000 classes) with 4 classes.
-model.fc = nn.Linear(model.fc.in_features, 4)
-
-criterion = nn.CrossEntropyLoss()
-optimizer = optim.Adam(model.parameters(), lr=0.001)
-
-
-#freezing all the weights except for fc layer.
-for param in model.parameters():
-	param.requires_grad = False
-
-for param in model.fc.parameters():
-	param.requires_grad = True
+# Escludi gli strati fully-connected di ResNet50 (include_top=False)
+base_model = ResNet50(weights='imagenet', include_top=False, input_shape=(32, 32, 3))
+base_model.trainable = False
 
 
-transform = transforms.Compose([
-    transforms.Resize((160, 160)),
-    transforms.ToTensor(),
-    transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
-])
-
-train_dataset = datasets.ImageFolder('/home/pide/aml/image-auto-orientation/ss-dataset/train', transform=transform)
-train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
-
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model.to(device)
-#training loop
-num_epochs = 15
-for epoch in range(num_epochs):
-    model.train()
-    running_loss = 0.0
-    
-    for images, labels in train_loader:
-        images, labels = images.to(device), labels.to(device)
-
-        optimizer.zero_grad()
-        outputs = model(images)
-        loss = criterion(outputs, labels)
-        loss.backward()
-        optimizer.step()
-
-        running_loss += loss.item()
-
-    print(f'Epoch {epoch+1}/{num_epochs}, Loss: {running_loss/len(train_loader):.4f}')
-
-print('Training complete!')
+out = GlobalAveragePooling2D()(base_model.output)
+out = Dense(1, activation='sigmoid')(out)
 
 
-# Save model
-torch.save(model.state_dict(), 'resnet_orientation.pth')
+model = Model(inputs=base_model.input, outputs=out)
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
-# Load model
-model.load_state_dict(torch.load('resnet_orientation.pth'))
-model.eval()  # Set to evaluation mode
+model.summary()
 
-test_dataset = datasets.ImageFolder('/home/pide/aml/image-auto-orientation/ss-dataset/test', transform=transform)
-test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
+train_datagen = ImageDataGenerator(
+    rescale=1./255,
+    validation_split=0.15
+)
 
-correct = 0
-total = 0
-with torch.no_grad():
-    for images, labels in test_loader:
-        images, labels = images.to(device), labels.to(device)
-        outputs = model(images)
-        _, predicted = torch.max(outputs, 1)
-        correct += (predicted == labels).sum().item()
-        total += labels.size(0)
+train_generator = train_datagen.flow_from_directory(
+    train_path,
+    target_size=(32, 32),
+    batch_size=16,
+    class_mode='binary',
+    subset='training',
+    shuffle=True
+)
 
-accuracy = 100 * correct / total
-print(f"Test Accuracy: {accuracy:.2f}%")
+val_generator = train_datagen.flow_from_directory(
+    train_path,
+    target_size=(32, 32),
+    batch_size=16,
+    class_mode='binary',
+    subset='validation',
+    shuffle=True
+)
+
+early_stopping = EarlyStopping(
+    monitor='val_loss',
+    patience=5,
+    restore_best_weights=True
+)
+
+
+start = time.time()
+history = model.fit(
+    train_generator,
+    validation_data=val_generator,
+    epochs=50,
+    callbacks=[early_stopping]
+)
+
+
+for layer in base_model.layers[-30:]:
+    layer.trainable = True
+
+model.compile(optimizer=tf.keras.optimizers.SGD(learning_rate=1e-4, momentum=0.9),
+              loss='binary_crossentropy',
+              metrics=["accuracy"])
+
+early_stopping = EarlyStopping(
+    monitor='val_loss',
+    patience=5,
+    restore_best_weights=True
+)
+
+history = model.fit(
+    train_generator,
+    validation_data=val_generator,
+    epochs=50,
+    callbacks=[early_stopping]
+)
+
+
+end = time.time()
+total_time = end - start
+
+test_datagen = ImageDataGenerator(rescale=1./255)
+test_generator = test_datagen.flow_from_directory(
+    test_path,
+    target_size=(32, 32),
+    batch_size=32,
+    class_mode="binary",
+    shuffle=True
+)
+
+test_loss, test_acc = model.evaluate(test_generator, verbose=1)
+
+print(f"Test Loss: {test_loss:.4f}")
+print(f"Test Accuracy: {test_acc:.4f}")
+
+# Salvataggio del modello e dei risultati
+ut.save_model_and_metrics(model, model.count_params(), total_time, history, test_acc, 'cifar10', '../../trained-models', 'resnet50-cifar10')

@@ -70,12 +70,12 @@ def build_model_02(input_shape, num_classes):
     model.add(MaxPooling2D(pool_size=(2,2)))
     model.add(MaxPooling2D(pool_size=(2,2)))
     
-    model.add(Conv2D(128, kernel_size=(3,3), activation='relu', kernel_regularizer=l2(0.01)))
+    model.add(Conv2D(128, kernel_size=(3,3), activation='relu', kernel_regularizer=l2(0.0001)))
     model.add(Conv2D(128, kernel_size=(3,3), activation='relu'))
     model.add(MaxPooling2D(pool_size=(2,2)))
     model.add(MaxPooling2D(pool_size=(2,2)))
     
-    model.add(Conv2D(256, kernel_size=(3,3), activation='relu', kernel_regularizer=l2(0.01)))
+    model.add(Conv2D(256, kernel_size=(3,3), activation='relu', kernel_regularizer=l2(0.0001)))
     model.add(Conv2D(256, kernel_size=(3,3), activation='relu'))
     model.add(MaxPooling2D(pool_size=(2,2)))
     model.add(MaxPooling2D(pool_size=(2,2)))   
@@ -98,19 +98,19 @@ def build_model_03(input_shape, num_classes):
     model=Sequential()
     model.add(Input(shape=input_shape))
 
-    model.add(Conv2D(32, kernel_size=(3,3), activation='relu', kernel_regularizer=l2(0.01)))
+    model.add(Conv2D(32, kernel_size=(3,3), activation='relu', kernel_regularizer=l2(0.001)))
     model.add(Conv2D(32, kernel_size=(3,3), activation='relu'))
     model.add(MaxPooling2D(pool_size=(2,2)))
 
     model.add(Conv2D(64, kernel_size=(3,3), activation='relu'))
     model.add(Conv2D(64, kernel_size=(3,3), activation='relu'))
     model.add(MaxPooling2D(pool_size=(2,2)))
-    #model.add(MaxPooling2D(pool_size=(2,2)))
+    model.add(MaxPooling2D(pool_size=(2,2)))
 
     model.add(Conv2D(128, kernel_size=(3,3), activation='relu'))
-    model.add(Conv2D(128, kernel_size=(3,3), activation='relu', kernel_regularizer=l2(0.01)))
+    model.add(Conv2D(128, kernel_size=(3,3), activation='relu', kernel_regularizer=l2(0.001)))
     model.add(MaxPooling2D(pool_size=(2,2)))
-    #model.add(MaxPooling2D(pool_size=(2,2)))
+    model.add(MaxPooling2D(pool_size=(2,2)))
 
     model.add(Flatten())
 

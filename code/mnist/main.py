@@ -16,7 +16,7 @@ from tensorflow.keras.layers import Input, Dense, Flatten, Conv2D, MaxPooling2D,
 from sklearn.model_selection import train_test_split
 
 from tensorflow.keras.regularizers import l2
-
+"""
 dataset_path = "../../mnist-dataset"
 x, y = ut.generate_dataset(dataset_path, (28, 28), channels=1)
 
@@ -36,7 +36,7 @@ print(y_train.shape)
 print(y_test.shape)
 
 print("\nBuild the model: \n")
-
+"""
 model = Sequential()
 model.add(Input(shape=(28,28,1)))
 

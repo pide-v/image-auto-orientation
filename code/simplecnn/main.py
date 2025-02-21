@@ -32,13 +32,13 @@ if gpus:
 
 train_datagen = ImageDataGenerator(
     rescale=1./255,
-    validation_split=0.2
+    validation_split=0.15
 )
 
 train_generator = train_datagen.flow_from_directory(
     train_path,
     target_size=(224, 224),
-    batch_size=8,
+    batch_size=32,
     class_mode="binary",
     subset="training"
 )
@@ -46,7 +46,7 @@ train_generator = train_datagen.flow_from_directory(
 val_generator = train_datagen.flow_from_directory(
     train_path,
     target_size=(224, 224),
-    batch_size=8,
+    batch_size=32,
     class_mode="binary",
     subset="validation"
 )
@@ -60,7 +60,7 @@ early_stopping = EarlyStopping(
 optimizer = 'adam'
 loss = "binary_crossentropy"
 
-model = models.build_model_03((224,224, 3), 1)
+model = models.build_model_02((224,224, 3), 1)
 
 model.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
 
